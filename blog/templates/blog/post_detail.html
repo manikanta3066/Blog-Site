@@ -1,8 +1,49 @@
 {% extends 'blog/base.html' %}
 
+{% block title %}{{ post.title }}{% endblock %}
+
 {% block content %}
-<h2>{{ post.title }}</h2>
-<p>{{ post.content }}</p>
-<p><a href="{% url 'post_update' post.pk %}">Edit</a> |
-   <a href="{% url 'post_delete' post.pk %}">Delete</a></p>
+    <!-- Back Navigation -->
+    <div class="nav-breadcrumb">
+        <a href="{% url 'post_list' %}" class="back-link">← Back to All Posts</a>
+    </div>
+    
+    <!-- Post Article -->
+    <article class="post-detail">
+        <!-- Post Header -->
+        <header class="post-header">
+            <h1 class="post-detail-title">{{ post.title }}</h1>
+            
+            <div class="post-detail-meta">
+                <div class="meta-item">
+                    <span class="meta-icon">👤</span>
+                    <span class="meta-text">{{ post.author }}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-icon">📅</span>
+                    <span class="meta-text">{{ post.created_at|date:"F j, Y" }}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-icon">🕒</span>
+                    <span class="meta-text">{{ post.content|wordcount }} words • 3 min read</span>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Post Content -->
+        <div class="post-content">
+            {{ post.content|linebreaks }}
+        </div>
+        
+        <!-- Post Actions -->
+        <footer class="post-actions">
+            <div class="action-buttons">
+                <a href="{% url 'post_update' pk=post.pk %}" class="btn btn-primary">✏️ Edit Post</a>
+                <a href="{% url 'post_delete' pk=post.pk %}" class="btn btn-danger">🗑️ Delete Post</a>
+            </div>
+            <div class="post-navigation">
+                <a href="{% url 'post_list' %}" class="btn btn-outline">📚 All Posts</a>
+            </div>
+        </footer>
+    </article>
 {% endblock %}

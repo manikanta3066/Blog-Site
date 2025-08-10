@@ -1,20 +1,26 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Blog</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Blog Site{% endblock %}</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'blog/style.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
-        <h1><a href="{% url 'post_list' %}" style="color: #fff; text-decoration: none;">My Blog</a></h1>
+        <div style="max-width:1200px;margin:0 auto;padding:0 20px;">
+            <h1 style="margin:0;font-size:2.2rem;font-weight:700;letter-spacing:1.2px;text-shadow:0 2px 4px rgba(0,0,0,0.3);">
+                <a href="{% url 'post_list' %}" style="color:inherit;text-decoration:none;">✨ My Blog</a>
+            </h1>
+        </div>
     </header>
     <div class="container">
-        {% block content %}
-        {% endblock %}
+        {% block content %}{% endblock %}
     </div>
-    <footer>
+    <div class="footer">
         &copy; {{ year|default:2025 }} My Blog. All rights reserved.
-    </footer>
+    </div>
 </body>
 </html>

@@ -1,30 +1,46 @@
 {% extends 'blog/base.html' %}
 
-{% block content %}
-<div class="posts-grid">
-    {% for post in posts %}
-        <article class="post-card">
-            <h2 class="post-title">
-                <a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a>
-            </h2>
-            <div class="post-meta">
-                Posted on {{ post.created_at|date:"F j, Y" }}
-            </div>
-            <p class="post-excerpt">{{ post.content|truncatewords:30 }}</p>
-            <a href="{% url 'post_detail' post.pk %}" class="btn">Read More</a>
-        </article>
-    {% empty %}
-        <div class="empty-state">
-            <h3>No posts yet</h3>
-            <p>Be the first one to share your thoughts!</p>
-            <a href="{% url 'post_new' %}" class="btn btn-accent">Create First Post</a>
-        </div>
-    {% endfor %}
-</div>
+{% block title %}Blog Posts{% endblock %}
 
-{% if posts %}
-    <div class="action-bar">
-        <a href="{% url 'post_new' %}" class="btn btn-accent">Write New Post</a>
+{% block content %}
+    <div class="page-header">
+        <div class="header-content">
+            <h2 class="page-title">📚 All Posts</h2>
+            <p class="page-subtitle">Discover amazing articles and insights</p>
+        </div>
+        <a href="{% url 'post_new' %}" class="btn btn-primary">✏️ New Post</a>
     </div>
-{% endif %}
+    
+    <div class="posts-grid">
+        {% for post in posts %}
+            <article class="post-card">
+                <div class="post-card-header">
+                    <h3 class="post-card-title">
+                        <a href="{% url 'post_detail' pk=post.pk %}">{{ post.title }}</a>
+                    </h3>
+                </div>
+                
+                <div class="post-card-meta">
+                    <span class="author">👤 {{ post.author }}</span>
+                    <span class="date">📅 {{ post.created_at|date:"M j, Y" }}</span>
+                </div>
+                
+                <div class="post-card-content">
+                    <p>{{ post.content|truncatewords:25 }}</p>
+                </div>
+                
+                <div class="post-card-footer">
+                    <a href="{% url 'post_detail' pk=post.pk %}" class="btn btn-outline">Read More →</a>
+                    <span class="read-time">2 min read</span>
+                </div>
+            </article>
+        {% empty %}
+            <div class="empty-state">
+                <div class="empty-icon">📝</div>
+                <h3>No posts yet</h3>
+                <p>Be the first to share your thoughts with the world!</p>
+                <a href="{% url 'post_new' %}" class="btn btn-primary">Create First Post</a>
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}

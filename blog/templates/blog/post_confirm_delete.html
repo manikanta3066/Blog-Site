@@ -1,10 +1,152 @@
-{% extends 'base.html' %}
+{% extends 'blog/base.html' %}
+
+{% block title %}Delete "{{ post.title }}" - Confirm{% endblock %}
 
 {% block content %}
-<h2>Are you sure you want to delete "{{ post.title }}"?</h2>
-<form method="post">
-    {% csrf_token %}
-    <button type="submit">Yes, delete</button>
-    <a href="{% url 'post_list' %}">Cancel</a>
-</form>
+    <!-- Page Header -->
+    <div class="delete-header">
+        <div class="form-nav-breadcrumb">
+            <a href="{% url 'post_detail' pk=post.pk %}" class="back-link">← Back to Post</a>
+        </div>
+        <h1 class="delete-title">
+            <span class="delete-icon">🗑️</span> Delete Post
+        </h1>
+        <p class="delete-subtitle">
+            This action cannot be undone. Please confirm your decision.
+        </p>
+    </div>
+
+    <!-- Delete Confirmation Card -->
+    <div class="delete-container">
+        <div class="delete-warning">
+            <div class="warning-icon">⚠️</div>
+            <div class="warning-content">
+                <h3 class="warning-title">Permanent Deletion Warning</h3>
+                <p class="warning-text">
+                    You are about to permanently delete this post. This action cannot be reversed.
+                </p>
+            </div>
+        </div>
+
+        <!-- Post Preview -->
+        <div class="delete-preview">
+            <h3 class="preview-title">Post to be deleted:</h3>
+            <div class="preview-card">
+                <div class="preview-meta">
+                    <span class="meta-item">
+                        <span class="meta-icon">👤</span> {{ post.author }}
+                    </span>
+                    <span class="meta-item">
+                        <span class="meta-icon">📅</span> {{ post.created_at|date:"F j, Y" }}
+                    </span>
+                    <span class="meta-item">
+                        <span class="meta-icon">📖</span> {{ post.content|wordcount }} words
+                    </span>
+                </div>
+                <h4 class="preview-post-title">{{ post.title }}</h4>
+                <div class="preview-content">
+                    {{ post.content|linebreaks|truncatewords:30 }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Confirmation Form -->
+        <div class="delete-confirmation">
+            <h3 class="confirmation-title">Are you absolutely sure?</h3>
+            <p class="confirmation-text">
+                Type <strong>"DELETE"</strong> in the box below to confirm deletion:
+            </p>
+            
+            <form method="post" class="delete-form" id="deleteForm">
+                {% csrf_token %}
+                
+                <div class="confirmation-input">
+                    <input type="text" 
+                           id="confirmTitle" 
+                           class="confirm-field" 
+                           placeholder="Type DELETE to confirm..."
+                           autocomplete="off">
+                    <small class="confirmation-help">Type "DELETE" (case-sensitive) to enable the delete button</small>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="delete-actions">
+                    <div class="danger-actions">
+                        <button type="submit" 
+                                class="btn btn-danger btn-large" 
+                                id="deleteButton" 
+                                disabled>
+                            💀 Delete Forever
+                        </button>
+                    </div>
+                    <div class="safe-actions">
+                        <a href="{% url 'post_detail' pk=post.pk %}" class="btn btn-outline">
+                            👁️ View Post
+                        </a>
+                        <a href="{% url 'post_update' pk=post.pk %}" class="btn btn-primary">
+                            ✏️ Edit Instead
+                        </a>
+                        <a href="{% url 'post_list' %}" class="btn btn-secondary">
+                            📚 All Posts
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript for Confirmation -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const confirmInput = document.getElementById('confirmTitle');
+            const deleteButton = document.getElementById('deleteButton');
+            const deleteForm = document.getElementById('deleteForm');
+            const expectedText = "DELETE";
+            
+            // Handle input validation
+            confirmInput.addEventListener('input', function() {
+                const inputValue = this.value.trim();
+                if (inputValue === expectedText) {
+                    deleteButton.disabled = false;
+                    deleteButton.classList.remove('btn-disabled');
+                    deleteButton.style.opacity = '1';
+                    deleteButton.style.cursor = 'pointer';
+                    console.log('Delete button enabled');
+                } else {
+                    deleteButton.disabled = true;
+                    deleteButton.classList.add('btn-disabled');
+                    deleteButton.style.opacity = '0.5';
+                    deleteButton.style.cursor = 'not-allowed';
+                    console.log('Delete button disabled');
+                }
+            });
+            
+            // Handle form submission
+            deleteForm.addEventListener('submit', function(e) {
+                const inputValue = confirmInput.value.trim();
+                console.log('Form submitted with value:', inputValue);
+                
+                if (inputValue !== expectedText) {
+                    e.preventDefault();
+                    alert('Please type "DELETE" exactly to confirm deletion.');
+                    confirmInput.focus();
+                    return false;
+                }
+                
+                // Final browser confirmation
+                const finalConfirm = confirm('This will permanently delete the post "{{ post.title }}". Are you sure?');
+                if (!finalConfirm) {
+                    e.preventDefault();
+                    return false;
+                }
+                
+                console.log('Form submission allowed - deleting post');
+                // Allow form to submit
+                return true;
+            });
+            
+            // Focus on input field when page loads
+            confirmInput.focus();
+        });
+    </script>
 {% endblock %}

@@ -1,37 +1,95 @@
 {% extends 'blog/base.html' %}
 
-{% block content %}
-<div class="form-container">
-    <h2 class="form-title">{% if form.instance.pk %}Edit Post{% else %}Create New Post{% endif %}</h2>
-    
-    <form method="post" class="post-form">
-        {% csrf_token %}
-        {% for field in form %}
-            <div class="form-group">
-                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {{ field }}
-                {% if field.help_text %}
-                    <small class="help-text">{{ field.help_text }}</small>
-                {% endif %}
-            </div>
-        {% endfor %}
-        
-        <div class="form-actions">
-            <button type="submit" class="btn btn-accent">{% if form.instance.pk %}Update{% else %}Publish{% endif %}</button>
-            <a href="{% url 'post_list' %}" class="btn">Cancel</a>
-        </div>
-    </form>
-</div>
-{% endblock %}log/base.html' %}
+{% block title %}Edit Post - {{ post.title }}{% endblock %}
 
-{% comment %} {% block content %}
-  <h2>{% if form.instance.pk %}Edit Post{% else %}New Post{% endif %}</h2>
-  <form method="post">
-    {% csrf_token %}
-    <div style="margin-bottom: 20px;">
-      {{ form.as_p }}
+{% block content %}
+    <!-- Page Header -->
+    <div class="form-header">
+        <div class="form-nav-breadcrumb">
+            <a href="{% url 'post_detail' pk=post.pk %}" class="back-link">← Back to Post</a>
+        </div>
+        <h1 class="form-title">
+            <span class="form-icon">✏️</span> Edit Post
+        </h1>
+        <p class="form-subtitle">
+            Make changes to "<strong>{{ post.title }}</strong>" and update your content.
+        </p>
     </div>
-    <button class="btn" type="submit">Save</button>
-    <a class="btn" href="{% url 'post_list' %}">Cancel</a>
-  </form>
-{% endblock %} {% endcomment %}
+
+    <!-- Post Edit Form -->
+    <div class="form-container">
+        <form method="post" class="post-form">
+            {% csrf_token %}
+            
+            {% for field in form %}
+                <div class="form-field">
+                    <label class="field-label" for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                        {% if field.field.required %}
+                            <span class="required-indicator">*</span>
+                        {% endif %}
+                    </label>
+                    
+                    <div class="field-wrapper">
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small class="field-help">{{ field.help_text }}</small>
+                        {% endif %}
+                    </div>
+                    
+                    {% if field.errors %}
+                        <div class="field-errors">
+                            {% for error in field.errors %}
+                                <span class="error-message">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <div class="primary-actions">
+                    <button type="submit" class="btn btn-primary btn-large">
+                        💾 Update Post
+                    </button>
+                </div>
+                <div class="secondary-actions">
+                    <a href="{% url 'post_detail' pk=post.pk %}" class="btn btn-outline">
+                        👁️ View Post
+                    </a>
+                    <a href="{% url 'post_list' %}" class="btn btn-secondary">
+                        📚 All Posts
+                    </a>
+                    <a href="{% url 'post_delete' pk=post.pk %}" class="btn btn-danger">
+                        🗑️ Delete Post
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Post Preview -->
+    <div class="edit-preview">
+        <h3 class="preview-title">
+            <span class="preview-icon">👀</span> Current Post Preview
+        </h3>
+        <div class="preview-card">
+            <div class="preview-meta">
+                <span class="meta-item">
+                    <span class="meta-icon">👤</span> {{ post.author }}
+                </span>
+                <span class="meta-item">
+                    <span class="meta-icon">📅</span> {{ post.created_at|date:"F j, Y" }}
+                </span>
+                <span class="meta-item">
+                    <span class="meta-icon">✏️</span> Last edited {{ post.updated_at|timesince }} ago
+                </span>
+            </div>
+            <h4 class="preview-post-title">{{ post.title }}</h4>
+            <div class="preview-content">
+                {{ post.content|linebreaks|truncatewords:50 }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

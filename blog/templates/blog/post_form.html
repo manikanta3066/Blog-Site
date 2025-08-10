@@ -1,9 +1,82 @@
-{% extends 'base.html' %}
+{% extends 'blog/base.html' %}
+
+{% block title %}{% if form.instance.pk %}Edit Post{% else %}Create New Post{% endif %}{% endblock %}
 
 {% block content %}
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save</button>
-</form>
+    <!-- Page Header -->
+    <div class="form-header">
+        <div class="form-nav-breadcrumb">
+            <a href="{% url 'post_list' %}" class="back-link">← Back to All Posts</a>
+        </div>
+        <h1 class="form-title">
+            {% if form.instance.pk %}
+                <span class="form-icon">✏️</span> Edit Post
+            {% else %}
+                <span class="form-icon">✨</span> Create New Post
+            {% endif %}
+        </h1>
+        <p class="form-subtitle">
+            {% if form.instance.pk %}
+                Update your post with new content and save your changes.
+            {% else %}
+                Share your thoughts and ideas with the world. Create something amazing!
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- Post Form -->
+    <div class="form-container">
+        <form method="post" class="post-form">
+            {% csrf_token %}
+            
+            {% for field in form %}
+                <div class="form-field">
+                    <label class="field-label" for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                        {% if field.field.required %}
+                            <span class="required-indicator">*</span>
+                        {% endif %}
+                    </label>
+                    
+                    <div class="field-wrapper">
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small class="field-help">{{ field.help_text }}</small>
+                        {% endif %}
+                    </div>
+                    
+                    {% if field.errors %}
+                        <div class="field-errors">
+                            {% for error in field.errors %}
+                                <span class="error-message">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <div class="primary-actions">
+                    <button type="submit" class="btn btn-primary btn-large">
+                        {% if form.instance.pk %}
+                            💾 Update Post
+                        {% else %}
+                            🚀 Publish Post
+                        {% endif %}
+                    </button>
+                </div>
+                <div class="secondary-actions">
+                    <a href="{% url 'post_list' %}" class="btn btn-outline">
+                        ❌ Cancel
+                    </a>
+                    {% if form.instance.pk %}
+                        <a href="{% url 'post_detail' pk=form.instance.pk %}" class="btn btn-secondary">
+                            👁️ View Post
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
 {% endblock %}
